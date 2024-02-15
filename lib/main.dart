@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:test_supabase/core/repositories/settings/interface_settings.dart';
+import 'package:test_supabase/core/repositories/settings/settings.dart';
 import 'package:test_supabase/di/injection_dependencies.dart';
 import 'package:test_supabase/routes/route_generate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load();
-  String supabaseUrl = dotenv.get('SUPABASE_URL', fallback: '');
-  String supabaseAnonKey = dotenv.get('SUPABASE_ANON_KEY', fallback: '');
+  ISettings iSettings = Settings();
+  await iSettings.initializedEnvironments(fileName: ".env-settings");
 
   await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+    url: await iSettings.getData(environmentVariable: "URL"),
+    anonKey: await iSettings.getData(environmentVariable: "KEY"),
   );
 
   DI.setupDependencies();
